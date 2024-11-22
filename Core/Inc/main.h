@@ -102,6 +102,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+extern TIM_HandleTypeDef htim12;
 extern CRC_HandleTypeDef   hcrc;
 extern UART_HandleTypeDef huart4;
 #define DEBUG_UART huart4
