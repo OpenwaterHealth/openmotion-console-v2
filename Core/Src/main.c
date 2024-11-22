@@ -27,6 +27,7 @@
 #include "usbd_cdc_if.h"
 #include "uart_comms.h"
 #include "fan_driver.h"
+#include "led_driver.h"
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
@@ -164,6 +165,7 @@ int main(void)
   printf("CPU Clock Frequency: %lu MHz\r\n", HAL_RCC_GetSysClockFreq() / 1000000);
   printf("Initializing, please wait ...\r\n");
 
+  LED_Init();
   HAL_Delay(100);
   HAL_GPIO_WritePin(HUB_RESET_GPIO_Port, HUB_RESET_Pin, GPIO_PIN_SET);
   HAL_Delay(100);
@@ -898,7 +900,7 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	HAL_GPIO_TogglePin(IND1_GPIO_Port, IND1_Pin);
+	LED_Toggle(IND1_GPIO_Port, IND1_Pin);
 	osDelay(250);
   }
   /* USER CODE END 5 */
