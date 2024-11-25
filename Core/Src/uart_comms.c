@@ -110,7 +110,7 @@ void comms_receive_task(void *argument) {
     tx_flag = 0;
     while(1) {
     	CDC_ReceiveToIdle(rxBuffer, COMMAND_MAX_SIZE);
-    	ulTaskNotifyTake(pdTRUE, 0);  // Clear previous notifications
+
     	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
 		printf("data received\r\n");
