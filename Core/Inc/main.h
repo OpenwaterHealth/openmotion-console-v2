@@ -104,6 +104,9 @@ void Error_Handler(void);
 
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim12;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim5;
 extern CRC_HandleTypeDef   hcrc;
 extern UART_HandleTypeDef huart4;
 #define DEBUG_UART huart4
