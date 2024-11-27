@@ -87,6 +87,13 @@ typedef enum {
 } OWPacketTypes;
 
 typedef enum {
+	OW_CTRL_SET_TRIG = 0x13,
+	OW_CTRL_GET_TRIG = 0x14,
+	OW_CTRL_START_TRIG = 0x15,
+	OW_CTRL_STOP_TRIG = 0x16,
+} MotionControllerCommands;
+
+typedef enum {
 	OW_CODE_SUCCESS = 0x00,
 	OW_CODE_IDENT_ERROR = 0xFD,
 	OW_CODE_DATA_ERROR = 0xFE,

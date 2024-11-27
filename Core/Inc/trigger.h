@@ -25,6 +25,8 @@ typedef struct {
 HAL_StatusTypeDef Trigger_SetConfig(const Trigger_Config_t *config);
 HAL_StatusTypeDef Trigger_Start() ;
 HAL_StatusTypeDef Trigger_Stop();
+HAL_StatusTypeDef Trigger_SetConfigFromJSON(char *jsonString, size_t str_len);
+HAL_StatusTypeDef Trigger_GetConfigToJSON(char *jsonString);
 
 extern Trigger_Config_t trigger_config;
 

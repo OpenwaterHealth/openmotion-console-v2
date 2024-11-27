@@ -183,7 +183,6 @@ int main(void)
   // configure PWM for trigger pulse
   const Trigger_Config_t myTriggerConfig = { 40, 1000, 100, 100 };
   Trigger_SetConfig(&myTriggerConfig);
-  Trigger_Start();
   /* USER CODE END 2 */
 
   /* Init scheduler */

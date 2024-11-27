@@ -15,6 +15,8 @@
 #include "usbd_cdc_if.h"
 #include "cmsis_os.h"
 
+#include "trigger.h"
+
 // Private variables
 extern uint8_t rxBuffer[COMMAND_MAX_SIZE];
 extern uint8_t txBuffer[COMMAND_MAX_SIZE];
@@ -26,6 +28,8 @@ volatile uint8_t tx_flag = 0;
 SemaphoreHandle_t uartTxSemaphore;
 SemaphoreHandle_t xRxSemaphore;
 TaskHandle_t commsTaskHandle;
+
+static char retTriggerJson[0xFF];
 
 const osThreadAttr_t comm_rec_task_attribs = {
   .name = "comRecTask",
@@ -244,6 +248,46 @@ UartPacket process_if_command(UartPacket cmd)
 			break;
 		case OW_CMD_NOP:
 			printf("NOP response\r\n");
+			break;
+		case OW_CTRL_START_TRIG:
+			printf("Start Trigger\r\n");
+			uartResp.command = cmd.command;
+			uartResp.addr = cmd.addr;
+			uartResp.reserved = cmd.reserved;
+			uartResp.data_len = 0;
+			Trigger_Start();
+			break;
+		case OW_CTRL_STOP_TRIG:
+			printf("Stop Trigger\r\n");
+			uartResp.command = cmd.command;
+			uartResp.addr = cmd.addr;
+			uartResp.reserved = cmd.reserved;
+			uartResp.data_len = 0;
+			Trigger_Stop();
+			break;
+		case OW_CTRL_SET_TRIG:
+			printf("Set Trigger\r\n");
+			uartResp.command = cmd.command;
+			uartResp.addr = cmd.addr;
+			uartResp.reserved = cmd.reserved;
+			uartResp.data_len = 0;
+
+			if(!Trigger_SetConfigFromJSON((char *)cmd.data, cmd.data_len))
+			{
+				uartResp.packet_type = OW_ERROR;
+			}
+
+			break;
+
+		case OW_CTRL_GET_TRIG:
+			printf("Get Trigger\r\n");
+			memset(retTriggerJson, 0, sizeof(retTriggerJson));
+			Trigger_GetConfigToJSON(retTriggerJson);
+			uartResp.command = cmd.command;
+			uartResp.addr = cmd.addr;
+			uartResp.reserved = cmd.reserved;
+			uartResp.data_len = strlen(retTriggerJson);
+			uartResp.data = (uint8_t *)retTriggerJson;
 			break;
 		default:
 			break;

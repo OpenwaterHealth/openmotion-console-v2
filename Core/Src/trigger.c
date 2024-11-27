@@ -16,6 +16,84 @@
 // setup default
 Trigger_Config_t trigger_config = { 40, 1000, 100, 100 };
 
+
+static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
+  if (tok->type == JSMN_STRING && (int)strlen(s) == tok->end - tok->start &&
+      strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+    return 0;
+  }
+  return -1;
+}
+
+static int jsonToTriggerConfigData(const char *jsonString, Trigger_Config_t* newConfig)
+{
+	int i;
+	int r;
+    jsmn_parser parser;
+    parser.size = sizeof(parser);
+    jsmn_init(&parser, NULL);
+    jsmntok_t t[16];
+
+	// init parser
+	jsmn_init(&parser, NULL);
+	r = jsmn_parse(&parser, jsonString, strlen(jsonString), t,
+				 sizeof(t) / sizeof(t[0]), NULL);
+	if (r < 0) {
+		printf("jsonToTriggerConfigData Failed to parse JSON: %d\n", r);
+		return 1;
+	}
+
+	/* Assume the top-level element is an object */
+	if (r < 1 || t[0].type != JSMN_OBJECT) {
+		printf("jsonToTriggerConfigData Object expected\n");
+		return 1;
+	}
+
+
+	/* Loop over all keys of the root object */
+	for (i = 1; i < r; i++) {
+	    if (jsoneq(jsonString, &t[i], "TriggerFrequencyHz") == 0) {
+			/* We may use strndup() to fetch string value */
+	    	newConfig->frequencyHz = strtol(jsonString + t[i + 1].start, NULL, 10);
+			//printf("- frequencyHz: %.*s\r\n", t[i + 1].end - t[i + 1].start,
+			//		jsonString + t[i + 1].start);
+			i++;
+	    } else if (jsoneq(jsonString, &t[i], "TriggerPulseWidthUsec") == 0) {
+	    	/* We may additionally check if the value is either "true" or "false" */
+	    	newConfig->triggerPulseWidthUsec = strtol(jsonString + t[i + 1].start, NULL, 10);
+	    	i++;
+		} else if (jsoneq(jsonString, &t[i], "LaserPulseDelayUsec") == 0) {
+			/* We may want to do strtol() here to get numeric value */
+			newConfig->laserPulseDelayUsec = strtol(jsonString + t[i + 1].start, NULL, 10);
+			i++;
+		} else if (jsoneq(jsonString, &t[i], "LaserPulseWidthUsec") == 0) {
+			/* We may want to do strtol() here to get numeric value */
+			newConfig->laserPulseWidthUsec = strtol(jsonString + t[i + 1].start, NULL, 10);
+			i++;
+		}
+
+	}
+
+    return 0; // Successful parsing
+}
+
+
+static void trigger_GetConfigJSON(char *jsonString, size_t max_length)
+{
+    memset(jsonString, 0, max_length);
+    snprintf(jsonString, max_length,
+             "{"
+             "\"TriggerFrequencyHz\": %lu,"
+             "\"TriggerPulseWidthUsec\": %lu,"
+             "\"LaserPulseDelayUsec\": %lu,"
+             "\"LaserPulseWidthUsec\": %lu"
+             "}",
+             trigger_config.frequencyHz,
+             trigger_config.triggerPulseWidthUsec,
+             trigger_config.laserPulseDelayUsec,
+             trigger_config.laserPulseWidthUsec);
+}
+
 HAL_StatusTypeDef Trigger_SetConfig(const Trigger_Config_t *config) {
     if (config == NULL) {
         return HAL_ERROR; // Null pointer guard
@@ -72,5 +150,34 @@ HAL_StatusTypeDef Trigger_Stop() {
         return HAL_ERROR; // Handle error
     }
 
+    return HAL_OK;
+}
+
+
+HAL_StatusTypeDef Trigger_SetConfigFromJSON(char *jsonString, size_t str_len)
+{
+	uint8_t tempArr[255] = {0};
+	bool ret = HAL_OK;
+
+	Trigger_Config_t new_config = { 40, 1000, 100, 100 };
+    // Copy the JSON string to tempArr
+    memcpy((char *)tempArr, (char *)jsonString, str_len);
+
+	if (jsonToTriggerConfigData((const char *)tempArr, &new_config) == 0)
+	{
+		Trigger_SetConfig(&new_config);
+		ret = HAL_OK;
+	}
+	else{
+		ret = HAL_ERROR;
+	}
+
+	return ret;
+
+}
+
+HAL_StatusTypeDef Trigger_GetConfigToJSON(char *jsonString)
+{
+	trigger_GetConfigJSON(jsonString, 0xFF);
     return HAL_OK;
 }
