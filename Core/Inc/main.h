@@ -89,10 +89,14 @@ void Error_Handler(void);
 #define SCL_CFG_GPIO_Port GPIOD
 #define SDA_REM_Pin GPIO_PIN_13
 #define SDA_REM_GPIO_Port GPIOD
+#define SYNC_OUT_EN_N_Pin GPIO_PIN_7
+#define SYNC_OUT_EN_N_GPIO_Port GPIOC
 #define GPIO0_Pin GPIO_PIN_8
 #define GPIO0_GPIO_Port GPIOC
 #define IND3_Pin GPIO_PIN_9
 #define IND3_GPIO_Port GPIOA
+#define SYNC_IN_EN_Pin GPIO_PIN_10
+#define SYNC_IN_EN_GPIO_Port GPIOA
 #define GPIO3_Pin GPIO_PIN_10
 #define GPIO3_GPIO_Port GPIOC
 #define GPIO2_Pin GPIO_PIN_11

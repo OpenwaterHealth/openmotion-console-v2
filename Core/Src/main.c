@@ -927,7 +927,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, IND1_Pin|IND2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, IND1_Pin|IND2_Pin|SYNC_OUT_EN_N_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, FAN1_PWM_Pin|FAN2_PWM_Pin, GPIO_PIN_SET);
@@ -936,7 +936,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOD, SCL_CFG_Pin|SDA_REM_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(IND3_GPIO_Port, IND3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, IND3_Pin|SYNC_IN_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : ESTOP2_Pin ESTOP1_Pin */
   GPIO_InitStruct.Pin = ESTOP2_Pin|ESTOP1_Pin;
@@ -991,12 +991,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : IND3_Pin */
-  GPIO_InitStruct.Pin = IND3_Pin;
+  /*Configure GPIO pin : SYNC_OUT_EN_N_Pin */
+  GPIO_InitStruct.Pin = SYNC_OUT_EN_N_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(SYNC_OUT_EN_N_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : IND3_Pin SYNC_IN_EN_Pin */
+  GPIO_InitStruct.Pin = IND3_Pin|SYNC_IN_EN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(IND3_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
