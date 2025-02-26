@@ -8,13 +8,12 @@
 #ifndef INC_FAN_DRIVER_H_
 #define INC_FAN_DRIVER_H_
 
-
+#include "main.h"
 #include "stm32h7xx_hal.h"
 
 // Define constants
 #define FAN1_PWM_CHANNEL TIM_CHANNEL_1
 #define FAN2_PWM_CHANNEL TIM_CHANNEL_2
-#define FAN_PWM_TIMER htim1  // Use TIM1 for PWM generation
 #define TACH_PULSES_PER_REV 2  // Number of tachometer pulses per fan revolution
 
 // Function prototypes
