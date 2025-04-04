@@ -921,7 +921,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, FAN1_PWM_Pin|FAN2_PWM_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, SCL_CFG_Pin|IO_EXP_RSTN_Pin|IND1_Pin|enSyncOUT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, SCL_CFG_Pin|IND1_Pin|enSyncOUT_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(IO_EXP_RSTN_GPIO_Port, IO_EXP_RSTN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pins : HUB_RESET_Pin SDA_REM_Pin */
   GPIO_InitStruct.Pin = HUB_RESET_Pin|SDA_REM_Pin;
