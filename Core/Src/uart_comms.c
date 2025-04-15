@@ -29,7 +29,11 @@ SemaphoreHandle_t uartTxSemaphore;
 SemaphoreHandle_t xRxSemaphore;
 TaskHandle_t commsTaskHandle;
 
+extern uint8_t FIRMWARE_VERSION_DATA[3];
+static uint32_t id_words[3] = {0};
+
 static char retTriggerJson[0xFF];
+
 
 const osThreadAttr_t comm_rec_task_attribs = {
   .name = "comRecTask",
@@ -197,7 +201,7 @@ void comms_receive_task(void *argument) {
 			goto NextDataPacket;
 		}
 		printUartPacket(&cmd);
-		resp = process_if_command(cmd);
+		process_if_command(&resp, &cmd);
 
 NextDataPacket:
 		UART_INTERFACE_SendDMA(&resp);
@@ -228,20 +232,19 @@ void comms_init() {
 }
 
 
-UartPacket process_if_command(UartPacket cmd)
+_Bool process_if_command(UartPacket *uartResp, UartPacket *cmd)
 {
-	UartPacket uartResp;
-	uartResp.id = cmd.id;
-	uartResp.packet_type = OW_RESP;
-	uartResp.addr = 0;
-	uartResp.reserved = 0;
-	uartResp.data_len = 0;
-	uartResp.data = 0;
-	switch (cmd.packet_type)
+	uartResp->id = cmd->id;
+	uartResp->packet_type = OW_RESP;
+	uartResp->addr = 0;
+	uartResp->reserved = 0;
+	uartResp->data_len = 0;
+	uartResp->data = 0;
+	switch (cmd->packet_type)
 	{
 	case OW_CMD:
-		uartResp.command = cmd.command;
-		switch(cmd.command)
+		uartResp->command = cmd->command;
+		switch(cmd->command)
 		{
 		case OW_CMD_PING:
 			printf("ping response\r\n");
@@ -249,32 +252,50 @@ UartPacket process_if_command(UartPacket cmd)
 		case OW_CMD_NOP:
 			printf("NOP response\r\n");
 			break;
+		case OW_CMD_VERSION:
+			uartResp->data_len = sizeof(FIRMWARE_VERSION_DATA);
+			uartResp->data = FIRMWARE_VERSION_DATA;
+			break;
+		case OW_CMD_ECHO:
+			// exact copy
+			uartResp->data_len = cmd->data_len;
+			uartResp->data = cmd->data;
+			break;
+		case OW_CMD_HWID:
+			id_words[0] = HAL_GetUIDw0();
+			id_words[1] = HAL_GetUIDw1();
+			id_words[2] = HAL_GetUIDw2();
+			uartResp->data_len = 16;
+			uartResp->data = (uint8_t *)&id_words;
+			break;
+		case OW_CMD_TOGGLE_LED:
+			printf("Toggle LED\r\n");
+			HAL_GPIO_TogglePin(IND1_GPIO_Port, IND1_Pin);
+			break;
 		case OW_CTRL_START_TRIG:
 			printf("Start Trigger\r\n");
-			uartResp.command = cmd.command;
-			uartResp.addr = cmd.addr;
-			uartResp.reserved = cmd.reserved;
-			uartResp.data_len = 0;
+			uartResp->command = cmd->command;
+			uartResp->addr = cmd->addr;
+			uartResp->reserved = cmd->reserved;
+			uartResp->data_len = 0;
 			Trigger_Start();
 			break;
 		case OW_CTRL_STOP_TRIG:
 			printf("Stop Trigger\r\n");
-			uartResp.command = cmd.command;
-			uartResp.addr = cmd.addr;
-			uartResp.reserved = cmd.reserved;
-			uartResp.data_len = 0;
+			uartResp->addr = cmd->addr;
+			uartResp->reserved = cmd->reserved;
+			uartResp->data_len = 0;
 			Trigger_Stop();
 			break;
 		case OW_CTRL_SET_TRIG:
 			printf("Set Trigger\r\n");
-			uartResp.command = cmd.command;
-			uartResp.addr = cmd.addr;
-			uartResp.reserved = cmd.reserved;
-			uartResp.data_len = 0;
+			uartResp->addr = cmd->addr;
+			uartResp->reserved = cmd->reserved;
+			uartResp->data_len = 0;
 
-			if(!Trigger_SetConfigFromJSON((char *)cmd.data, cmd.data_len))
+			if(!Trigger_SetConfigFromJSON((char *)cmd->data, cmd->data_len))
 			{
-				uartResp.packet_type = OW_ERROR;
+				uartResp->packet_type = OW_ERROR;
 			}
 
 			break;
@@ -283,20 +304,20 @@ UartPacket process_if_command(UartPacket cmd)
 			printf("Get Trigger\r\n");
 			memset(retTriggerJson, 0, sizeof(retTriggerJson));
 			Trigger_GetConfigToJSON(retTriggerJson);
-			uartResp.command = cmd.command;
-			uartResp.addr = cmd.addr;
-			uartResp.reserved = cmd.reserved;
-			uartResp.data_len = strlen(retTriggerJson);
-			uartResp.data = (uint8_t *)retTriggerJson;
+
+			uartResp->addr = cmd->addr;
+			uartResp->reserved = cmd->reserved;
+			uartResp->data_len = strlen(retTriggerJson);
+			uartResp->data = (uint8_t *)retTriggerJson;
 			break;
 		default:
 			break;
 		}
 		break;
 	default:
-		uartResp.data_len = 0;
-		uartResp.packet_type = OW_UNKNOWN;
-		// uartResp.data = (uint8_t*)&cmd.tag;
+		uartResp->data_len = 0;
+		uartResp->packet_type = OW_UNKNOWN;
+		// uartResp.data = (uint8_t*)&cmd->tag;
 		break;
 	}
 

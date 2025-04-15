@@ -122,6 +122,6 @@ typedef struct  {
 	uint16_t crc;
 } UartPacket;
 
-UartPacket process_if_command(UartPacket cmd);
+_Bool process_if_command(UartPacket *uartResp, UartPacket *cmd);
 
 #endif /* INC_COMMON_H_ */
