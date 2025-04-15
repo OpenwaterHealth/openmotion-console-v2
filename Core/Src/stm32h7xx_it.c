@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2024 STMicroelectronics.
+  * Copyright (c) 2025 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -56,10 +56,7 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
-extern RNG_HandleTypeDef hrng;
-extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim4;
-extern TIM_HandleTypeDef htim5;
 extern TIM_HandleTypeDef htim12;
 extern DMA_HandleTypeDef hdma_uart4_rx;
 extern DMA_HandleTypeDef hdma_uart4_tx;
@@ -197,20 +194,6 @@ void DMA1_Stream1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM2 global interrupt.
-  */
-void TIM2_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM2_IRQn 0 */
-
-  /* USER CODE END TIM2_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim2);
-  /* USER CODE BEGIN TIM2_IRQn 1 */
-
-  /* USER CODE END TIM2_IRQn 1 */
-}
-
-/**
   * @brief This function handles TIM4 global interrupt.
   */
 void TIM4_IRQHandler(void)
@@ -239,20 +222,6 @@ void TIM8_BRK_TIM12_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles TIM5 global interrupt.
-  */
-void TIM5_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM5_IRQn 0 */
-
-  /* USER CODE END TIM5_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim5);
-  /* USER CODE BEGIN TIM5_IRQn 1 */
-
-  /* USER CODE END TIM5_IRQn 1 */
-}
-
-/**
   * @brief This function handles UART4 global interrupt.
   */
 void UART4_IRQHandler(void)
@@ -264,48 +233,6 @@ void UART4_IRQHandler(void)
   /* USER CODE BEGIN UART4_IRQn 1 */
 
   /* USER CODE END UART4_IRQn 1 */
-}
-
-/**
-  * @brief This function handles HASH and RNG global interrupts.
-  */
-void HASH_RNG_IRQHandler(void)
-{
-  /* USER CODE BEGIN HASH_RNG_IRQn 0 */
-
-  /* USER CODE END HASH_RNG_IRQn 0 */
-  HAL_RNG_IRQHandler(&hrng);
-  /* USER CODE BEGIN HASH_RNG_IRQn 1 */
-
-  /* USER CODE END HASH_RNG_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USB On The Go FS End Point 1 Out global interrupt.
-  */
-void OTG_FS_EP1_OUT_IRQHandler(void)
-{
-  /* USER CODE BEGIN OTG_FS_EP1_OUT_IRQn 0 */
-
-  /* USER CODE END OTG_FS_EP1_OUT_IRQn 0 */
-  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
-  /* USER CODE BEGIN OTG_FS_EP1_OUT_IRQn 1 */
-
-  /* USER CODE END OTG_FS_EP1_OUT_IRQn 1 */
-}
-
-/**
-  * @brief This function handles USB On The Go FS End Point 1 In global interrupt.
-  */
-void OTG_FS_EP1_IN_IRQHandler(void)
-{
-  /* USER CODE BEGIN OTG_FS_EP1_IN_IRQn 0 */
-
-  /* USER CODE END OTG_FS_EP1_IN_IRQn 0 */
-  HAL_PCD_IRQHandler(&hpcd_USB_OTG_FS);
-  /* USER CODE BEGIN OTG_FS_EP1_IN_IRQn 1 */
-
-  /* USER CODE END OTG_FS_EP1_IN_IRQn 1 */
 }
 
 /**

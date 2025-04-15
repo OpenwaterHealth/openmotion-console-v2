@@ -106,18 +106,18 @@ HAL_StatusTypeDef Trigger_SetConfig(const Trigger_Config_t *config) {
 
     // TIM2 Configuration: Trigger Frequency
     uint32_t tim2_period = 1000000 / config->frequencyHz; // Convert frequency to period in microseconds
-    __HAL_TIM_SET_AUTORELOAD(&htim2, tim2_period - 1);    // Set TIM2 period
-    __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, config->triggerPulseWidthUsec); // Set PWM pulse width for TIM2 Channel 1
+    __HAL_TIM_SET_AUTORELOAD(&FSYNC_TIMER, tim2_period - 1);    // Set TIM2 period
+    __HAL_TIM_SET_COMPARE(&FSYNC_TIMER, FSYNC_TIMER_CHAN, config->triggerPulseWidthUsec); // Set PWM pulse width for TIM2 Channel 1
 
     // TIM4 Configuration: Laser Pulse Delay
     uint32_t adjusted_pulse_delay = config->laserPulseDelayUsec/2;
-    __HAL_TIM_SET_AUTORELOAD(&htim4, adjusted_pulse_delay); // Set TIM4 period to ensure timing range
-    __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, adjusted_pulse_delay/2); // Set PWM for 50% duty cycle on Channel 1
+    __HAL_TIM_SET_AUTORELOAD(&LASER_TIMER, adjusted_pulse_delay); // Set TIM4 period to ensure timing range
+    __HAL_TIM_SET_COMPARE(&LASER_TIMER, LASER_TIMER_CHAN, adjusted_pulse_delay/2); // Set PWM for 50% duty cycle on Channel 1
 
     // TIM5 Configuration: Laser Pulse Width (with inverted signal logic)
 
-    __HAL_TIM_SET_AUTORELOAD(&htim5, config->laserPulseWidthUsec + adjusted_pulse_delay); // Extend by 50 us
-    __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, adjusted_pulse_delay); // Set inverted PWM pulse width on Channel 2
+    __HAL_TIM_SET_AUTORELOAD(&SYNC_TIMER, config->laserPulseWidthUsec + adjusted_pulse_delay); // Extend by 50 us
+    __HAL_TIM_SET_COMPARE(&SYNC_TIMER, SYNC_TIMER_CHAN, adjusted_pulse_delay); // Set inverted PWM pulse width on Channel 2
 
     // Update the global trigger configuration
     trigger_config = *config;
@@ -126,13 +126,13 @@ HAL_StatusTypeDef Trigger_SetConfig(const Trigger_Config_t *config) {
 
 
 HAL_StatusTypeDef Trigger_Start() {
-    if (HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1) != HAL_OK) {
+    if (HAL_TIM_PWM_Start(&LASER_TIMER, LASER_TIMER_CHAN) != HAL_OK) {
         return HAL_ERROR; // Handle error
     }
-    if (HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2) != HAL_OK) {
+    if (HAL_TIM_PWM_Start(&SYNC_TIMER, SYNC_TIMER_CHAN) != HAL_OK) {
         return HAL_ERROR; // Handle error
     }
-    if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1) != HAL_OK) {
+    if (HAL_TIM_PWM_Start(&FSYNC_TIMER, FSYNC_TIMER_CHAN) != HAL_OK) {
         return HAL_ERROR; // Handle error
     }
 
@@ -140,13 +140,13 @@ HAL_StatusTypeDef Trigger_Start() {
 }
 
 HAL_StatusTypeDef Trigger_Stop() {
-    if (HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1) != HAL_OK) {
+    if (HAL_TIM_PWM_Stop(&FSYNC_TIMER, FSYNC_TIMER_CHAN) != HAL_OK) {
         return HAL_ERROR; // Handle error
     }
-    if (HAL_TIM_PWM_Stop(&htim5, TIM_CHANNEL_2) != HAL_OK) {
+    if (HAL_TIM_PWM_Stop(&SYNC_TIMER, SYNC_TIMER_CHAN) != HAL_OK) {
         return HAL_ERROR; // Handle error
     }
-    if (HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1) != HAL_OK) {
+    if (HAL_TIM_PWM_Stop(&LASER_TIMER, LASER_TIMER_CHAN) != HAL_OK) {
         return HAL_ERROR; // Handle error
     }
 
